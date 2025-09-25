@@ -7,8 +7,10 @@ function App() {
 	const [highScore, setHighScore] = useState(0);
 	const [score, setScore] = useState(0);
 	const [fetchNewPokemon, setFetchNewPokemon] = useState(true);
+	const [error, setError] = useState(null);
 
 	useEffect(() => {
+		setIsLoading(true);
 		let ignore = false;
 		let count = 1;
 
@@ -16,15 +18,26 @@ function App() {
 			async function fetchPokemon() {
 				const random = Math.floor(Math.random() * 500 + 1);
 
-				const response = await fetch(
-					`https://pokeapi.co/api/v2/pokemon/${random}/`
-				);
-				const data = await response.json();
+				try {
+					const response = await fetch(
+						`https://pokeapi.co/api/v2/pokemon/${random}/`
+					);
 
-				if (!ignore) {
-					// if by chance the same pokemon was fetched
+					if (response.status >= 400) {
+						throw new Error('Server error code: ' + response.status);
+					}
 
-					setPokemon((pokemon) => [...pokemon, data]);
+					const data = await response.json();
+
+					if (!ignore) {
+						// if by chance the same pokemon was fetched
+
+						setPokemon((pokemon) => [...pokemon, data]);
+					}
+				} catch (err) {
+					setError(err);
+				} finally {
+					setIsLoading(false);
 				}
 			}
 
@@ -34,7 +47,6 @@ function App() {
 
 		return () => {
 			ignore = true;
-			setIsLoading(false);
 		};
 	}, [fetchNewPokemon]);
 
@@ -85,29 +97,32 @@ function App() {
 		setPokemon(newDeck);
 	}
 
+	if (error) return <p>A network error was encountered</p>;
+
 	return (
-		<div>
-			<header className='text-center'>
-				<h1>Pokemon Memory Game</h1>
-				<p>
+		<div className='h-screen flex flex-col justify-center gap-10 pb-20'>
+			<header className='text-center  bg-slate-400/50 rounded-lg'>
+				<h1 className='text-xl'>Pokemon Memory Game</h1>
+				<p className='text-lg'>
 					Score points for every <em>different</em> pokemon clicked
 				</p>
+				<div className='text-lg flex gap-8 justify-center'>
+					<div>Score: {score}</div>
+					<div>High Score: {highScore}</div>
+				</div>
 			</header>
-			<div>
-				Score: {score} High Score: {highScore}
-			</div>
-			<ul className='flex gap-4 justify-center items-center flex-wrap'>
+			<ul className='flex gap-4 justify-center flex-wrap'>
 				{isLoading
-					? 'Loading'
+					? 'Loading...'
 					: pokemon.map((poke) => (
 							<li
 								key={poke.id}
-								className='bg-blue-300 rounded-lg'
+								className='bg-slate-400/50 rounded-lg w-32 h-40 flex flex-col justify-center hover:bg-slate-300/50'
 								onClick={handleClick}
 								id={poke.id}
 							>
 								<img src={poke.sprites.front_default} alt={poke.name} />
-								<p className='text-center'>{poke.name}</p>
+								<p className='text-center pb-2'>{poke.name}</p>
 							</li>
 					  ))}
 			</ul>
