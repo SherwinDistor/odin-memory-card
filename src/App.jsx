@@ -145,7 +145,7 @@ export default function App() {
 				''
 			)}
 			<div className='h-screen flex flex-col justify-center gap-10 pb-20 z-0'>
-				<header className='text-center bg-slate-400/50 rounded-lg mt-10'>
+				<header className='text-center bg-slate-400/50 rounded-lg mt-20'>
 					<h1 className='text-xl'>Pokemon Memory Game</h1>
 					<p className='text-lg'>
 						Score points for every <em>different</em> pokemon clicked
