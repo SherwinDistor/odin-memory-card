@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-function App() {
+export default function App() {
 	const [pokemon, setPokemon] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const [clicked, setClicked] = useState([]);
@@ -14,10 +14,16 @@ function App() {
 		setIsLoading(true);
 		let ignore = false;
 		let count = 1;
+		let duplicate = [];
 
 		while (count <= 5) {
 			async function fetchPokemon() {
-				const random = Math.floor(Math.random() * 500 + 1);
+				let random = Math.floor(Math.random() * 1000 + 1);
+				// Check to see if there are duplicate random ids
+				if (duplicate.includes(random)) {
+					random += 5;
+				}
+				duplicate.push(random);
 
 				try {
 					const response = await fetch(
@@ -48,6 +54,7 @@ function App() {
 
 		return () => {
 			ignore = true;
+			duplicate = [];
 		};
 	}, [fetchNewPokemon]);
 
@@ -108,20 +115,20 @@ function App() {
 		setPokemon(newDeck);
 	}
 
-	function handleGameState(e) {
-		if (e.target.value == 0) {
-			setGameState(0);
-		}
+	function handleGameState() {
+		setGameState(0);
 	}
 
 	if (error) return <p>A network error was encountered</p>;
 
 	return (
 		<>
-			{gameState == 1 ? (
+			{gameState >= 1 ? (
 				<div className='h-screen w-screen fixed z-10 bg-slate-400/75'>
 					<div className='z-20 fixed rounded-lg bg-slate-700 top-1/2 left-1/2 -translate-1/2 px-24 py-16 text-center'>
-						<h2 className='text-4xl mb-4'>You win!</h2>
+						<h2 className='text-4xl mb-4'>
+							{gameState == 1 ? 'You win!' : 'Game Over :('}
+						</h2>
 						<p className='text-lg mb-2'>Play again?</p>
 						<div className='flex justify-center gap-8'>
 							<button
@@ -131,17 +138,9 @@ function App() {
 							>
 								Yes
 							</button>
-							<button
-								className='rounded-lg px-4 py-1 bg-red-400 hover:bg-red-300'
-								onClick={handleGameState}
-							>
-								No
-							</button>
 						</div>
 					</div>
 				</div>
-			) : gameState == 2 ? (
-				'show lose model'
 			) : (
 				''
 			)}
@@ -175,5 +174,3 @@ function App() {
 		</>
 	);
 }
-
-export default App;
