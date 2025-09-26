@@ -127,7 +127,7 @@ export default function App() {
 				<div className='h-screen w-screen fixed z-10 bg-slate-400/75'>
 					<div className='z-20 fixed rounded-lg bg-slate-700 top-1/2 left-1/2 -translate-1/2 px-24 py-16 text-center'>
 						<h2 className='text-4xl mb-4'>
-							{gameState == 1 ? 'You win!' : 'Game Over :('}
+							{gameState == 1 ? 'You win!' : 'Game Over'}
 						</h2>
 						<p className='text-lg mb-2'>Play again?</p>
 						<div className='flex justify-center gap-8'>
@@ -145,7 +145,7 @@ export default function App() {
 				''
 			)}
 			<div className='h-screen flex flex-col justify-center gap-10 pb-20 z-0'>
-				<header className='text-center  bg-slate-400/50 rounded-lg'>
+				<header className='text-center bg-slate-400/50 rounded-lg mt-10'>
 					<h1 className='text-xl'>Pokemon Memory Game</h1>
 					<p className='text-lg'>
 						Score points for every <em>different</em> pokemon clicked
