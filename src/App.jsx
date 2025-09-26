@@ -8,6 +8,7 @@ function App() {
 	const [score, setScore] = useState(0);
 	const [fetchNewPokemon, setFetchNewPokemon] = useState(true);
 	const [error, setError] = useState(null);
+	const [gameState, setGameState] = useState(0);
 
 	useEffect(() => {
 		setIsLoading(true);
@@ -55,6 +56,7 @@ function App() {
 
 		if (clicked.includes(e.currentTarget.id)) {
 			console.log('Game Over');
+			setGameState(2);
 
 			setScore(0);
 			setClicked([]);
@@ -74,8 +76,17 @@ function App() {
 		if (newScore > highScore) {
 			setHighScore(newScore);
 		}
-		// add win condition
 
+		// win condition
+		if (newScore == 5) {
+			setGameState(1);
+			setScore(0);
+			setClicked([]);
+			setPokemon([]);
+			setFetchNewPokemon(!fetchNewPokemon);
+			console.log('triggered');
+			return;
+		}
 		console.log('shuffle deck');
 		shuffle();
 	}
@@ -97,36 +108,71 @@ function App() {
 		setPokemon(newDeck);
 	}
 
+	function handleGameState(e) {
+		if (e.target.value == 0) {
+			setGameState(0);
+		}
+	}
+
 	if (error) return <p>A network error was encountered</p>;
 
 	return (
-		<div className='h-screen flex flex-col justify-center gap-10 pb-20'>
-			<header className='text-center  bg-slate-400/50 rounded-lg'>
-				<h1 className='text-xl'>Pokemon Memory Game</h1>
-				<p className='text-lg'>
-					Score points for every <em>different</em> pokemon clicked
-				</p>
-				<div className='text-lg flex gap-8 justify-center'>
-					<div>Score: {score}</div>
-					<div>High Score: {highScore}</div>
-				</div>
-			</header>
-			<ul className='flex gap-4 justify-center flex-wrap'>
-				{isLoading
-					? 'Loading...'
-					: pokemon.map((poke) => (
-							<li
-								key={poke.id}
-								className='bg-slate-400/50 rounded-lg w-32 h-40 flex flex-col justify-center hover:bg-slate-300/50'
-								onClick={handleClick}
-								id={poke.id}
+		<>
+			{gameState == 1 ? (
+				<div className='h-screen w-screen fixed z-10 bg-slate-400/75'>
+					<div className='z-20 fixed rounded-lg bg-slate-700 top-1/2 left-1/2 -translate-1/2 px-24 py-16 text-center'>
+						<h2 className='text-4xl mb-4'>You win!</h2>
+						<p className='text-lg mb-2'>Play again?</p>
+						<div className='flex justify-center gap-8'>
+							<button
+								className='rounded-lg px-4 py-1 bg-green-400 hover:bg-green-300'
+								onClick={handleGameState}
+								value={0}
 							>
-								<img src={poke.sprites.front_default} alt={poke.name} />
-								<p className='text-center pb-2'>{poke.name}</p>
-							</li>
-					  ))}
-			</ul>
-		</div>
+								Yes
+							</button>
+							<button
+								className='rounded-lg px-4 py-1 bg-red-400 hover:bg-red-300'
+								onClick={handleGameState}
+							>
+								No
+							</button>
+						</div>
+					</div>
+				</div>
+			) : gameState == 2 ? (
+				'show lose model'
+			) : (
+				''
+			)}
+			<div className='h-screen flex flex-col justify-center gap-10 pb-20 z-0'>
+				<header className='text-center  bg-slate-400/50 rounded-lg'>
+					<h1 className='text-xl'>Pokemon Memory Game</h1>
+					<p className='text-lg'>
+						Score points for every <em>different</em> pokemon clicked
+					</p>
+					<div className='text-lg flex gap-8 justify-center'>
+						<div>Score: {score}</div>
+						<div>High Score: {highScore}</div>
+					</div>
+				</header>
+				<ul className='flex gap-4 justify-center flex-wrap'>
+					{isLoading
+						? 'Loading...'
+						: pokemon.map((poke) => (
+								<li
+									key={poke.id}
+									className='bg-slate-400/50 rounded-lg w-32 h-40 flex flex-col justify-center hover:bg-slate-300/50'
+									onClick={handleClick}
+									id={poke.id}
+								>
+									<img src={poke.sprites.front_default} alt={poke.name} />
+									<p className='text-center pb-2'>{poke.name}</p>
+								</li>
+						  ))}
+				</ul>
+			</div>
+		</>
 	);
 }
 
